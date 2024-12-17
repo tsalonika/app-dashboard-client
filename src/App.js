@@ -18,6 +18,7 @@ import FollowersIcon from "./assets/images/followers-icon.png";
 import PostsIcon from "./assets/images/posts-icon.png";
 import {
   getAccountSentiment,
+  getFakeAccount,
   getMediaPost,
   getOnlineActivityByDay,
   getOnlineActivityByWeek,
@@ -30,6 +31,7 @@ import {
   getUserInfo,
 } from "./services/api";
 import { formatNumber } from "./utils/utils";
+import { FakeAccount } from "./pages";
 
 const App = () => {
   const [loading, setLoading] = useState(false);
@@ -50,6 +52,10 @@ const App = () => {
   const [sentimentAccount, setSentimentAccount] = useState({});
   const [onlineActivityData, setOnlineActivityData] = useState([]);
   const [onlineActivityWeekData, setOnlineActivityWeekData] = useState([]);
+  const [fullName, setFullName] = useState("");
+  const [phonenumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [fakeAccountData, setFakeAccountData] = useState({});
 
   const handleSelectType = (selected) => {
     setSelectedType(selected);
@@ -67,6 +73,18 @@ const App = () => {
     setUsername(e.target.value);
   };
 
+  const handleChangeFullName = (e) => {
+    setFullName(e.target.value);
+  };
+
+  const handleChangePhoneNumber = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  const handleChangeEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
   const handleDateRangeChange = (selectedDates) => {
     const formattedDates = selectedDates.map((date) =>
       date ? new Date(date).toISOString().split("T")[0] : null
@@ -74,12 +92,7 @@ const App = () => {
     setRangeDate(formattedDates);
   };
 
-  const handleSearchUserClick = async () => {
-    if (!username || !selectedMedia || !rangeDate) {
-      setError(true);
-      return;
-    }
-
+  const resetData = () => {
     setDataProfile({});
     setPostEngagementData([]);
     setPopularHashtagData([]);
@@ -93,38 +106,68 @@ const App = () => {
     setOnlineActivityWeekData([]);
     setError(false);
     setLoading(true);
-    try {
-      const result = await getUserInfo(username, selectedMedia, isVerified);
-      const dataEngagement = await getPostEngagement(
-        result.id,
-        rangeDate[0],
-        rangeDate[1]
-      );
-      const popularHashtag = await getPopularHashtag(result.id);
-      const popularMention = await getPopularMention(result.id);
-      const mediaPost = await getMediaPost(result.id);
-      const popularKeyword = await getPopularKeyword(result.id);
-      const popularEmail = await getPopularEmail(result.id);
-      const popularPhoneNumber = await getPopularPhoneNumber(result.id);
-      const accountSentiment = await getAccountSentiment(result.id);
-      const onlineActivity = await getOnlineActivityByDay(result.id);
-      const onlineActivityWeek = await getOnlineActivityByWeek(result.id);
+    setFakeAccountData({});
+  };
 
-      setDataProfile(result);
-      setPostEngagementData(dataEngagement);
-      setPopularHashtagData(popularHashtag);
-      setPopularMentionData(popularMention);
-      setMediaPostData(mediaPost);
-      setPopularKeywordData(popularKeyword);
-      setPopularEmailData(popularEmail);
-      setPopularPhoneNumberData(popularPhoneNumber);
-      setSentimentAccount(accountSentiment);
-      setOnlineActivityData(onlineActivity);
-      setOnlineActivityWeekData(onlineActivityWeek);
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-    } finally {
-      setLoading(false);
+  const handleSearchUserClick = async () => {
+    if (selectedType === "akun") {
+      if (!username || !selectedMedia || !rangeDate) {
+        setError(true);
+        return;
+      } else {
+        resetData();
+
+        try {
+          const result = await getUserInfo(username, selectedMedia, isVerified);
+          const dataEngagement = await getPostEngagement(
+            result.id,
+            rangeDate[0],
+            rangeDate[1]
+          );
+          const popularHashtag = await getPopularHashtag(result.id);
+          const popularMention = await getPopularMention(result.id);
+          const mediaPost = await getMediaPost(result.id);
+          const popularKeyword = await getPopularKeyword(result.id);
+          const popularEmail = await getPopularEmail(result.id);
+          const popularPhoneNumber = await getPopularPhoneNumber(result.id);
+          const accountSentiment = await getAccountSentiment(result.id);
+          const onlineActivity = await getOnlineActivityByDay(result.id);
+          const onlineActivityWeek = await getOnlineActivityByWeek(result.id);
+
+          setDataProfile(result);
+          setPostEngagementData(dataEngagement);
+          setPopularHashtagData(popularHashtag);
+          setPopularMentionData(popularMention);
+          setMediaPostData(mediaPost);
+          setPopularKeywordData(popularKeyword);
+          setPopularEmailData(popularEmail);
+          setPopularPhoneNumberData(popularPhoneNumber);
+          setSentimentAccount(accountSentiment);
+          setOnlineActivityData(onlineActivity);
+          setOnlineActivityWeekData(onlineActivityWeek);
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    } else if (selectedType === "fake") {
+      if (!fullName) {
+        setError(true);
+        return;
+      } else {
+        resetData();
+
+        try {
+          const dataFakeAccount = await getFakeAccount(fullName);
+          setFakeAccountData(dataFakeAccount);
+          console.log("ini fake account", dataFakeAccount);
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
     }
   };
 
@@ -182,7 +225,11 @@ const App = () => {
       </div>
 
       <div className="mt-5">
-        <div className="flex flex-row gap-5 items-center justify-between">
+        <div
+          className={`flex flex-row gap-5 ${
+            selectedType === "fake" ? "flex-start" : "items-center"
+          } justify-between`}
+        >
           <div className="w-full">
             <p className="mb-2">Pilih Tipe</p>
             <Dropdown
@@ -203,6 +250,37 @@ const App = () => {
           ) : (
             ""
           )}
+
+          {selectedType === "fake" ? (
+            <div className="w-full">
+              <div className="w-full">
+                <p className="mb-2">Masukkan nama</p>
+                <InputCustom
+                  errorCheck={error}
+                  placeholder="Masukkan Nama"
+                  handleChangeInput={(e) => handleChangeFullName(e)}
+                />
+              </div>
+              <div className="w-full mt-4">
+                <p className="mb-2">Masukkan no HP</p>
+                <InputCustom
+                  errorCheck={error}
+                  placeholder="Masukkan No HP"
+                  handleChangeInput={(e) => handleChangePhoneNumber(e)}
+                />
+              </div>
+              <div className="w-full mt-4">
+                <p className="mb-2">Masukkan Email</p>
+                <InputCustom
+                  errorCheck={error}
+                  placeholder="Masukkan Email"
+                  handleChangeInput={(e) => handleChangeEmail(e)}
+                />
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
         {selectedType === "akun" && (
           <div className="mt-5">
@@ -219,15 +297,20 @@ const App = () => {
             <p className="mb-2">Masukkan Hashtag</p>
             <InputCustom
               errorCheck={error}
-              placeholder="Masukkan Username @"
+              placeholder="Masukkan Hashtag #"
               handleChangeInput={(e) => handleChangeUsername(e)}
             />
           </div>
         )}
-        <div className="mt-5">
-          <p className="mb-2">Rentang Waktu</p>
-          <DateRange onDateChange={handleDateRangeChange} errorCheck={error} />
-        </div>
+        {selectedType === "akun" && (
+          <div className="mt-5">
+            <p className="mb-2">Rentang Waktu</p>
+            <DateRange
+              onDateChange={handleDateRangeChange}
+              errorCheck={error}
+            />
+          </div>
+        )}
         <div className="mt-5">
           <CustomButton
             isDisabled={loading}
@@ -697,6 +780,10 @@ const App = () => {
         </Fragment>
       ) : (
         ""
+      )}
+
+      {Object.keys(fakeAccountData).length !== 0 && (
+        <FakeAccount data={fakeAccountData} />
       )}
     </div>
   );

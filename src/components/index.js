@@ -10,3 +10,5 @@ export { default as DoughnutChart } from "./DoughnutChart";
 export { default as CloudyWords } from "./CloudyWords";
 export { default as RadarChart } from "./RadarChart";
 export { default as BarDiagramChart } from "./BarDiagramChart";
+export { default as CopyInput } from "./CopyInput";
+export { default as WorkAddressMap } from "./WorkAddressMap";

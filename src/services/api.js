@@ -144,3 +144,16 @@ export const getOnlineActivityByWeek = async (userId) => {
     return null;
   }
 };
+
+export const getFakeAccount = async (name) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/fakeAccount`, {
+      params: { name },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user info:", error.message || error);
+    return null;
+  }
+};

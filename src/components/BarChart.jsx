@@ -10,11 +10,9 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-// Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const BarChart = ({ data }) => {
-    // Extract the data for the chart
     const chartData = data.map(item => ({
         label: new Date(item.date).toLocaleDateString(),
         data: {
@@ -25,10 +23,8 @@ const BarChart = ({ data }) => {
         }
     }));
 
-    // Create labels for the x-axis
     const labels = chartData.map(item => item.label);
 
-    // Define dataset colors
     const colors = {
         Likes: '#FF5733',
         Comments: '#33FF57',
@@ -36,14 +32,12 @@ const BarChart = ({ data }) => {
         Posts: '#FF33A1'
     };
 
-    // Generate datasets for each metric
     const datasets = Object.keys(colors).map(metric => ({
         label: metric,
         backgroundColor: colors[metric],
         data: chartData.map(item => item.data[metric] || 0)
     }));
 
-    // Chart.js configuration object
     const chartConfig = {
         labels: labels,
         datasets: datasets
