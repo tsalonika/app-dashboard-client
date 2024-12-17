@@ -782,8 +782,12 @@ const App = () => {
         ""
       )}
 
-      {Object.keys(fakeAccountData).length !== 0 && (
+      {fakeAccountData && Object.keys(fakeAccountData).length !== 0 ? (
         <FakeAccount data={fakeAccountData} />
+      ) : (
+        <h4 className="font-bold text-4xl text-black text-center mt-10">
+          Not Found
+        </h4>
       )}
     </div>
   );
