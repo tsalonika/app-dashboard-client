@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { formatNumber } from '../utils/utils';
 
-const SlideOption = ({ options, labelKey }) => {
+const SlideOption = ({ options, labelKey, showTotal = true }) => {
     const [selectedOption, setSelectedOption] = useState(options[0][labelKey]);
 
     const handleChange = (e) => {
@@ -22,7 +22,7 @@ const SlideOption = ({ options, labelKey }) => {
                     value={option[labelKey]}
                     className={`font-semibold ${option[labelKey] === selectedOption ? 'bg-[#237D31] text-white' : ''}`}
                 >
-                    {option[labelKey]} ({formatNumber(option.total)})
+                    {option[labelKey]} {showTotal && `(${formatNumber(option.total)})`}
                 </option>
             ))}
         </select>
